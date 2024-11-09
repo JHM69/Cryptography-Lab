@@ -1,187 +1,198 @@
+
 # Cryptography Algorithms
 
-This project has some cryptographic algorithms, including traditional ciphers, polyalphabetic ciphers, modern block ciphers, and digital signatures. Each section includes the mathematical foundation and a brief explanation of the algorithm.
+This project covers various cryptographic algorithms, from classical to modern approaches. Each section includes mathematical foundations, theoretical background, and practical explanations.
 
 ## Traditional Ciphers (Monoalphabetic)
 
 ### Caesar Cipher
 
-The Caesar Cipher is a substitution cipher where each letter in the plaintext is shifted a certain number of places down the alphabet.
+The Caesar Cipher, named after Julius Caesar, is one of the earliest known encryption techniques. It's a substitution cipher where each letter in the plaintext is shifted a fixed number of positions down the alphabet.
 
-**Mathematical Representation:**
+**Mathematical Foundation:**
+For a given plaintext letter $P$ and a shift $k$, the ciphertext letter $C$ is:
 
-For a given plaintext letter \( P \) and a shift \( k \), the ciphertext letter \( C \) is given by:
+Encryption: $C \equiv (P + k) \pmod{26}$  
+Decryption: $P \equiv (C - k) \pmod{26}$
 
-$$ C = (P + k) \mod 26 $$
-
-**Decryption:**
-
-$$ P = (C - k) \mod 26 $$
+**Security Analysis:**
+- Extremely vulnerable to frequency analysis
+- Only 25 possible keys to try (brute force)
+- Zero diffusion and confusion properties
+- Suitable only for educational purposes
 
 ### Multiplicative Cipher
 
-The Multiplicative Cipher uses multiplication to encrypt the message.
+The Multiplicative Cipher extends the Caesar cipher by using multiplication instead of addition. This creates a more complex mapping between plaintext and ciphertext.
 
-**Mathematical Representation:**
+**Mathematical Foundation:**
+For plaintext $P$ and key $k$:
 
-For a given plaintext letter \( P \) and a key \( k \), the ciphertext letter \( C \) is:
+Encryption: $C \equiv (P \times k) \pmod{26}$  
+Decryption: $P \equiv (C \times k^{-1}) \pmod{26}$
 
-$$ C = (P \times k) \mod 26 $$
+Where $k^{-1}$ is the modular multiplicative inverse of $k$.
 
-**Decryption:**
-
-To decrypt, we need the modular inverse \( k^{-1} \) of \( k \):
-
-$$ P = (C \times k^{-1}) \mod 26 $$
+**Key Selection:**
+- $k$ must be coprime with 26 (allowed values: 1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25)
+- The existence of $k^{-1}$ is guaranteed when $\gcd(k, 26) = 1$
 
 ### Affine Cipher
 
-The Affine Cipher combines both multiplicative and additive ciphers.
+The Affine Cipher combines both multiplicative and additive (Caesar) components, creating a more complex encryption scheme.
 
-**Mathematical Representation:**
+**Mathematical Foundation:**
+For plaintext $P$ and keys $a, b$:
 
-For a given plaintext letter \( P \), the ciphertext letter \( C \) is:
+Encryption: $C \equiv (a \times P + b) \pmod{26}$  
+Decryption: $P \equiv a^{-1}(C - b) \pmod{26}$
 
-$$ C = (a \times P + b) \mod 26 $$
-
-**Decryption:**
-
-$$ P = a^{-1} \times (C - b) \mod 26 $$
-
-where \( a^{-1} \) is the modular inverse of \( a \).
+**Security Considerations:**
+- Still vulnerable to frequency analysis
+- Total key space is $\varphi(26) \times 26 = 12 \times 26 = 312$ possible keys
+- Provides slightly better security than Caesar but still not secure for modern use
 
 ## Polyalphabetic Ciphers
 
 ### Autokey Cipher
 
-The Autokey Cipher uses a keyword and the plaintext to generate the keystream.
+The Autokey Cipher improves upon simple substitution by using a keyword and the plaintext itself to generate the keystream.
 
-**Encryption:**
+**Mathematical Foundation:**
+For plaintext $P[i]$ and keystream $K[i]$:
 
-For a given plaintext \( P \) and key \( K \):
+Encryption: $C[i] \equiv (P[i] + K[i]) \pmod{26}$  
+Decryption: $P[i] \equiv (C[i] - K[i]) \pmod{26}$
 
-$$ C_i = (P_i + K_i) \mod 26 $$
-
-**Decryption:**
-
-$$ P_i = (C_i - K_i) \mod 26 $$
-
-### Playfair Cipher
-
-The Playfair Cipher uses a 5x5 matrix to encrypt pairs of letters.
-
-**Encryption:**
-
-- If both letters are in the same row, replace them with the letters to their immediate right.
-- If both letters are in the same column, replace them with the letters immediately below.
-- Otherwise, replace them with the letters on the same row but at the opposite corners of the rectangle.
+**Key Generation:**
+1. Start with the keyword
+2. Append the plaintext (except last character)
+3. Use this combined string as the keystream
 
 ### Vigenère Cipher
 
-The Vigenère Cipher uses a keyword to shift letters.
+The Vigenère Cipher was considered "le chiffre indéchiffrable" (the unbreakable cipher) for centuries.
 
-**Mathematical Representation:**
+**Mathematical Foundation:**
+For plaintext $P[i]$ and key $K[i]$:
 
-For a given plaintext \( P \) and key \( K \):
+Encryption: $C[i] \equiv (P[i] + K[i]) \pmod{26}$  
+Decryption: $P[i] \equiv (C[i] - K[i]) \pmod{26}$
 
-$$ C_i = (P_i + K_i) \mod 26 $$
-
-**Decryption:**
-
-$$ P_i = (C_i - K_i) \mod 26 $$
+**Security Features:**
+- Resistant to simple frequency analysis
+- Key length determines security strength
+- Vulnerable to Kasiski examination and index of coincidence analysis
 
 ### Hill Cipher
 
-The Hill Cipher uses linear algebra to encrypt blocks of text.
+The Hill Cipher introduces the concept of matrix operations in cryptography, encrypting blocks of text using linear algebra.
 
-**Mathematical Representation:**
+**Mathematical Foundation:**
+For $n \times n$ key matrix $K$:
 
-For a block of plaintext represented as a vector \( \mathbf{P} \) and a key matrix \( \mathbf{K} \):
+Encryption: $C = K \times P \pmod{26}$  
+Decryption: $P = K^{-1} \times C \pmod{26}$
 
-$$ \mathbf{C} = \mathbf{K} \cdot \mathbf{P} \mod 26 $$
+**Requirements:**
+- Key matrix must be invertible modulo 26
+- Determinant must be coprime with 26
+- Increased complexity with larger matrices
 
-**Decryption:**
+### One-Time Pad
 
-$$ \mathbf{P} = \mathbf{K}^{-1} \cdot \mathbf{C} \mod 26 $$
+The One-Time Pad is the only theoretically unbreakable cipher when used correctly.
 
-where \( \mathbf{K}^{-1} \) is the inverse of the key matrix.
+**Mathematical Foundation:**
+For each character position $i$:
 
-### One Time Pad
+Encryption: $C[i] \equiv (P[i] + K[i]) \pmod{26}$  
+Decryption: $P[i] \equiv (C[i] - K[i]) \pmod{26}$
 
-The One Time Pad uses a random key that is as long as the message.
-
-**Encryption:**
-
-$$ C_i = (P_i + K_i) \mod 26 $$
-
-**Decryption:**
-
-$$ P_i = (C_i - K_i) \mod 26 $$
-
-### Rail Fence Cipher
-
-The Rail Fence Cipher writes the message in a zigzag pattern.
-
-**Encryption:**
-
-The message is written in a zigzag pattern across multiple "rails" and then read off row by row.
+**Security Requirements:**
+1. Key must be truly random
+2. Key must be at least as long as the message
+3. Key must never be reused
+4. Key must be kept completely secret
 
 ## Modern Block Ciphers
 
-### DES (Data Encryption Standard)
-
-DES is a symmetric-key algorithm that uses a 56-bit key to encrypt data in 64-bit blocks.
-
-**Mathematical Representation:**
-
-DES uses a series of permutations and substitutions based on the key to transform the plaintext into ciphertext.
-
 ### AES (Advanced Encryption Standard)
 
-AES is a symmetric encryption algorithm that encrypts data in 128-bit blocks using keys of 128, 192, or 256 bits.
+AES is the current standard for symmetric encryption, operating on 128-bit blocks.
 
-**Mathematical Representation:**
+**Core Operations:**
+1. **SubBytes**: Non-linear substitution
+2. **ShiftRows**: Permutation step
+3. **MixColumns**: Linear mixing
+4. **AddRoundKey**: Key incorporation
 
-AES uses a series of transformations including substitution, permutation, and mixing of the input data.
+**Mathematical Foundation:**
+- Operations in Galois Field $GF(2^8)$
+- MixColumns multiplication matrix:
 
-### ElGamal
-
-ElGamal is an asymmetric key encryption algorithm based on the Diffie-Hellman key exchange.
-
-**Mathematical Representation:**
-
-- **Encryption:** \( C_1 = g^k \mod p \), \( C_2 = M \times y^k \mod p \)
-- **Decryption:** \( M = C_2 \times (C_1^x)^{-1} \mod p \)
+$$
+\begin{pmatrix}
+2 & 3 & 1 & 1 \\
+1 & 2 & 3 & 1 \\
+1 & 1 & 2 & 3 \\
+3 & 1 & 1 & 2 \\
+\end{pmatrix}
+$$
 
 ### RSA
 
-RSA is a public-key cryptosystem that is widely used for secure data transmission.
+RSA security is based on the difficulty of factoring large numbers.
 
-**Mathematical Representation:**
+**Mathematical Foundation:**
+1. Choose primes $p, q$
+2. $n = p \times q$
+3. $\phi(n) = (p - 1)(q - 1)$
+4. Choose $e$ where $1 < e < \phi(n)$ and $\gcd(e, \phi(n)) = 1$
+5. Calculate $d$ where $d \times e \equiv 1 \pmod{\phi(n)}$
 
-- **Encryption:** \( C = M^e \mod n \)
-- **Decryption:** \( M = C^d \mod n \)
+**Operations:**
+- Encryption: $C \equiv M^e \pmod{n}$
+- Decryption: $M \equiv C^d \pmod{n}$
 
-where \( n = p \times q \), and \( e \) and \( d \) are the public and private exponents, respectively.
+**Security Considerations:**
+- Key size typically 2048 or 4096 bits
+- Vulnerable to quantum computers (Shor's algorithm)
+- Relies on proper padding (PKCS#1 v2.1)
 
-### Knapsack
+### ElGamal
 
-The Knapsack problem is a public-key cryptosystem based on the subset sum problem.
+ElGamal is based on the Diffie-Hellman key exchange and the discrete logarithm problem.
 
-**Mathematical Representation:**
+**Mathematical Foundation:**
+Setup:
+1. Choose prime $p$ and generator $g$
+2. Select private key $x$
+3. Calculate public key $y = g^x \pmod{p}$
 
-- **Encryption:** Sum of selected weights from the public key.
-- **Decryption:** Use the private key to solve the subset sum problem.
+**Operations:**
+Encryption (with random $k$):
+- $C_1 = g^k \pmod{p}$
+- $C_2 = M \times y^k \pmod{p}$
+
+Decryption:
+- $M = C_2 \times (C_1^x)^{-1} \pmod{p}$
 
 ## Digital Signatures
 
 ### RSA Digital Signatures
 
-RSA Digital Signatures use RSA encryption to sign and verify messages.
+RSA signatures provide authentication and non-repudiation.
 
-**Mathematical Representation:**
+**Mathematical Foundation:**
+- Signing: $S \equiv H(M)^d \pmod{n}$
+- Verification: $H(M) \equiv S^e \pmod{n}$
 
-- **Signing:** \( S = H(M)^d \mod n \)
-- **Verification:** \( V = S^e \mod n \)
+Where $H(M)$ is a cryptographic hash function.
 
-where \( H(M) \) is the hash of the message.
+**Security Properties:**
+1. **Authentication**: Verifies the signer's identity
+2. **Non-repudiation**: Signer cannot deny signing
+3. **Integrity**: Message cannot be modified
+4. Uses same key pairs as RSA encryption
+
